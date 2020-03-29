@@ -1,0 +1,117 @@
+1. If we have this code:
+
+class Greeting
+  def greet(message)
+    puts message
+  end
+end
+
+class Hello < Greeting
+  def hi
+    greet("Hello")
+  end
+end
+
+class Goodbye < Greeting
+  def bye
+    greet("Goodbye")
+  end
+end
+What happens in each of the following cases:
+
+case 1:
+
+hello = Hello.new
+hello.hi
+
+A: Outputs "Hello" and returns `nil`
+
+case 2:
+
+hello = Hello.new
+hello.bye
+
+A: `NoMethodError` because `bye` is not defined in either `Hello` or the class it inherits from, `Greeting`
+
+case 3:
+
+hello = Hello.new
+hello.greet
+
+A: `ArgumentError` because there is a `greet` method defined in the lookup path but it takes an argument and none is given here.
+
+case 4:
+
+hello = Hello.new
+hello.greet("Goodbye")
+
+A: Outputs "Goodbye" and returns `nil`
+
+case 5:
+
+Hello.hi
+
+A: `NoMethodError` because although there is an instance method `hi` that can be called by instances of the `Hello` class, there is no class method `hi` defined on the `Hello` class itself.
+
+2. If we call Hello.hi we get an error message. How would you fix this?
+
+A:
+```
+class Greeting
+  def self.greet(message)
+    puts message
+  end
+end
+class Hello < Greeting
+  def self.hi
+    greet("Hello")
+  end
+end
+
+When objects are created they are a separate realization of a particular class.
+
+3. Given the class below, how do we create two different instances of this class, both with separate names and ages?
+
+class AngryCat
+  def initialize(age, name)
+    @age  = age
+    @name = name
+  end
+
+  def age
+    puts @age
+  end
+
+  def name
+    puts @name
+  end
+
+  def hiss
+    puts "Hisssss!!!"
+  end
+end
+
+A:
+```
+john = AngryCat.new(2, "John")
+frank = AngryCat.new(3, "Frank")
+
+4. Given the class below, if we created a new instance of the class and then called to_s on that instance we would get something like "#<Cat:0x007ff39b356d30>"
+
+class Cat
+  def initialize(type)
+    @type = type
+  end
+end
+How could we go about changing the to_s output on this method to look like this: I am a tabby cat? (this is assuming that "tabby" is the type we passed in during initialization).
+A:
+```
+class Cat
+  def initialize(type)
+    @type = type
+  end
+
+  def to_s
+    "I am a #{@type} cat."
+  end
+end

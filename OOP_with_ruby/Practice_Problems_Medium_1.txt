@@ -1,0 +1,178 @@
+1. Ben asked Alyssa to code review the following code:
+
+class BankAccount
+  attr_reader :balance
+
+  def initialize(starting_balance)
+    @balance = starting_balance
+  end
+
+  def positive_balance?
+    balance >= 0
+  end
+end
+
+Alyssa glanced over the code quickly and said - "It looks fine, except that you forgot to put the @ before balance when you refer to the balance instance variable in the body of the positive_balance? method."
+
+"Not so fast", Ben replied. "What I'm doing here is valid - I'm not missing an @!"
+
+Who is right, Ben or Alyssa, and why?
+
+A: Ben is right. The code on the first line of the class definition says `attr_reader :balance`. This makes a `balance` method available. In the `positive_balance?` method, the expression being compared to `0` is actually a method call to `#balance` which returns the value of the instance variable `@balance`.
+
+2. Alan created the following code to keep track of items for a shopping cart application he's writing:
+
+class InvoiceEntry
+  attr_reader :quantity, :product_name
+
+  def initialize(product_name, number_purchased)
+    @quantity = number_purchased
+    @product_name = product_name
+  end
+
+  def update_quantity(updated_count)
+    # prevent negative quantities from being set
+    quantity = updated_count if updated_count >= 0
+  end
+end
+
+Alyssa looked at the code and spotted a mistake. "This will fail when update_quantity is called", she says.
+
+Can you spot the mistake and how to address it?
+
+A: The way the code is written, Ruby will initialize a local variable `quantity`, evaluate the expression(s) to the right of the equals sign, and assign the result to `quantity`. What Alan wants is to set the instance variable `@quantity`. Therefore, the line must be
+
+```
+@quantity = updated_count if updated_count >= 0
+```
+Another way to do it is to provide a setter method for the `@quantity` variable by putting `attr_writer :quantity` at the top of the code outside all methods. Then the line in the `@update_quantity` method must be coded like this:
+
+```
+self.quantity = updated_count if updated_count >= 0
+```
+3. Since quantity is an instance variable, it must be accessed with the @quantity notation when setting it. One way to fix this is to change attr_reader to attr_accessor and change quantity to self.quantity.
+
+Is there anything wrong with fixing it this way?
+
+A: Kind of. The `update_quantity` method is intended to validate input, so that no negative numbers get assigned to the `@quantity` variable. But anyone with access to the `InvoiceEntry` object can still assign a negative number to `@quantity` by invoking the setter method `quantity=`, defeating the purpose of the validation in `update_quantity`. A better way to do it is, instead of changing `attr_reader` to `attr_accessor`, provide a custom setter method `quantity=` that validates input.
+
+4. Let's practice creating an object hierarchy.
+
+Create a class called Greeting with a single method called greet that takes a string argument and prints that argument to the terminal.
+
+Now create two other classes that are derived from Greeting: one called Hello and one called Goodbye. The Hello class should have a hi method that takes no arguments and prints "Hello". The Goodbye class should have a bye method to say "Goodbye". Make use of the Greeting class greet method when implementing the Hello and Goodbye classes - do not use any puts in the Hello or Goodbye classes.
+
+A: class Greeting
+  def greet(str)
+    puts str
+  end
+end
+
+class Hello < Greeting
+  def hi
+    greet("Hello")
+  end
+end
+
+class Goodbye < Greeting
+  def bye
+    greet("Goodbye")
+  end
+ends
+
+5. You are given the following class that has been implemented:
+
+class KrispyKreme
+  def initialize(filling_type, glazing)
+    @filling_type = filling_type
+    @glazing = glazing
+  end
+end
+And the following specification of expected behavior:
+
+donut1 = KrispyKreme.new(nil, nil)
+donut2 = KrispyKreme.new("Vanilla", nil)
+donut3 = KrispyKreme.new(nil, "sugar")
+donut4 = KrispyKreme.new(nil, "chocolate sprinkles")
+donut5 = KrispyKreme.new("Custard", "icing")
+
+puts donut1
+  => "Plain"
+
+puts donut2
+  => "Vanilla"
+
+puts donut3
+  => "Plain with sugar"
+
+puts donut4
+  => "Plain with chocolate sprinkles"
+
+puts donut5
+  => "Custard with icing"
+Write additional code for KrispyKreme such that the puts statements will work as specified above.
+
+A:
+```
+def to_s
+  donut_string = ""
+  if @filling
+    donut_string << @filling
+  else
+    donut_string << "Plain"
+  end
+  donut_string << "with #{@glazing}" if @glazing
+  donut_string
+end
+```
+
+6. If we have these two methods:
+
+class Computer
+  attr_accessor :template
+
+  def create_template
+    @template = "template 14231"
+  end
+
+  def show_template
+    template
+  end
+end
+
+and
+
+class Computer
+  attr_accessor :template
+
+  def create_template
+    self.template = "template 14231"
+  end
+
+  def show_template
+    self.template
+  end
+end
+What is the difference in the way the code works?
+
+A: In the first, the `create_template` method sets an instance variable `@template` directly, without calling the writer method provided by `attr_accessor`. The `show_template` method calls the reader method provided by `attr_accessor` and returns its return value, which is redundant because that reader method, `template`, does the job without the extra step.
+
+In the second, the `create_template` method does use the writer method provided by `attr_accessor` to set the `@template` variable. The `show_template` method again redundantly returns the return value of the reader method `template` provided by `attr_accessor`, and this time it uses `self` unnecessarily.
+
+7. How could you change the method name below so that the method name is more clear and less repetitive?
+
+class Light
+  attr_accessor :brightness, :color
+
+  def initialize(brightness, color)
+    @brightness = brightness
+    @color = color
+  end
+
+  def self.light_information
+    "I want to turn on the light with a brightness level of super high and a colour of green"
+  end
+
+end
+
+A: Just change it to `information`.
