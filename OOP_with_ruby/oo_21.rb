@@ -231,7 +231,7 @@ class Game
   end
 
   def clear_screen
-    system('cls')
+    system('clear')
   end
 end
 
