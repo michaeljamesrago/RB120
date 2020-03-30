@@ -130,12 +130,11 @@ end
 
 class Game
   def initialize
-    @player = Player.new
     @dealer = Dealer.new
   end
 
   def start
-    @player.name = ask_name
+    @player = Player.new(ask_name)
     loop do
       @dealer.deal(@player, @dealer)
       display_game
