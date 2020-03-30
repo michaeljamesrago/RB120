@@ -66,7 +66,7 @@ class Dealer < Player
   end
 
   def hit_or_stay
-    @show_all = true
+    self.show_all = true
     return :hit unless total >= 17
   end
 
